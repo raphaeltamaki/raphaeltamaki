@@ -4,7 +4,7 @@ project:
 
 website:
   title: "Raphael Tamaki's Blog"
-  site-url: https://tabacof.github.io/
+  site-url: https://raphaeltamaki.github.io/raphaeltamaki/
   description: ""
   navbar:
     right:

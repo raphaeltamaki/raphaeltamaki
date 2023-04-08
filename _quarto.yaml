@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: posts
+
+website:
+  title: "Raphael Tamaki's Blog"
+  site-url: https://tabacof.github.io/
+  description: ""
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/raphaeltamaki
+      - icon: linkedin
+        href: https://www.linkedin.com/in/raphael-de-brito-tamaki/
+format:
+  html:
+    theme: litera
+    css: styles.css

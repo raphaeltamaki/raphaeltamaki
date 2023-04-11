@@ -1,10 +1,3 @@
----
-title: "Digital Advertisement under Uncertainty"
-author: "Raphael Tamaki"
-date: "2023-04-08"
-categories: []
----
-
 # Digital Advertisement under Uncertainty
 
 
@@ -337,7 +330,7 @@ While the highest profit isn't relevant when comparing the curves, since we forc
 
 With the clear connection between *Cost per User* and profit, we can focus on LTV. The Lifetime Value of a user is, by definition, how much revenue a user generates in their lifetime, in other words, from the moment they started their 'life' as a user of a product until infinity. But we can't use infinity in practice, in good part because we need a target to train the machine-learning models, so the lifetime value is usually defined as just a date 'sufficiently away' in the future.
 
-The fact that the 'real' LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are sure of its exact value.
+The fact that the 'real' LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are unsure of its exact value.
 
 If we estimate the LTV of our users using any conventional machine-learning algorithm, one assumption that these models require is for the residual (basically the error) to be normally distributed. As such, we will assume that the LTV models' error is (1) unbiased and (2) follow a normal distribution.
 
@@ -379,7 +372,7 @@ plt.title(
     
 
 
-Again, I will reinforce that LTV is a predicted metric, and as such **until proven otherwise, it is what we believe to be true**. That is the case for any metric, but for most metrics, ML models predict, it becomes clear relatively fast if the model was wrong or not. But it can take many months until signs appear of bias in the LTV predictions, which can mean **several thousand, if not tens or hundreds of thousands of dollars, invested in marketing that are not coming back**
+Again, I will reinforce that LTV is a predicted metric, and as such **until proven otherwise, it is what we believe to be true**. That is the case for metric predicted by ML models, but for most cases, it becomes clear relatively fast if the model is wrong or not. But in the LTV , it can take many months until signs appear of bias predictions, which can mean overbidding in marketing campaigns, resulting in **several thousand, if not tens or hundreds of thousands of dollars, invested in marketing that are not coming back**.
 
 For example, assume five different scenarios where we keep the actual LTV at 2 dollars and use the *Volume Function* in orange from the first plot but have the estimated LTV to be \\$1, \\$1.5, \\$2, \\$2.5, or \\ $3. If we know the *Volume Function* and we were to optimize for the predicted expected value of LTV without budget being a constrain, we would operate at the indicated *estimated optimal cpi*, believe we would obtain the *estimated profit* while in practice it would be the *real profit*
 
@@ -460,7 +453,7 @@ plt.title(
     
 
 
-While one may think that a 50\% error for a prediction is too high, that is quite common for a new product being launched, for a marketing platform being introduced, or for a novel optimization within an existing platform, where there may not be much data. So given the risk involved in incorrectly predicting and specially overestimating the LTV, how should we adapt the bidding strategy change for different degrees of uncertainty?
+While one may think that a 50\% error for a prediction is too high, that is quite common for a new product being launched, for a marketing platform being introduced, or for a novel optimization within an existing platform. I.E. for any case where there may not be much data available and the situation is sufficiently novel from what was seen before. So given the risk involved in incorrectly predicting and specially overestimating the LTV, how should we adapt the bidding strategy change for different degrees of uncertainty?
 
 # 5- Bidding Strategy
 
@@ -525,7 +518,7 @@ grid = sns.relplot(plot_data,
                   )
 grid.figure.set_size_inches(PLOT_WITHD_INCHES, PLOT_HEIGHT_INCHES)
 plt.title(
-    'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus expected CPI for the log-normal distribution', 
+    'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus mean for log-normal distribution', 
     font='Avenir', 
     fontsize=24, 
     loc='left')
@@ -553,6 +546,8 @@ We demonstrated, under reasonable assumptions, that the LTV error and the Volume
 As a consequence of this asymmetry, overestimation in the context of LTV prediction is much more dangerous than underestimation: the amount of money lost by overestimating a given amount is more significant than the unexpected money earned when we underestimate it by the same intensity.
 
 Consequently, operating at a Cost per User below the expected optimum point is often beneficial. How much below it will depend on both the accuracy of the LTV predictions and how many more users can be acquired by an increase in the *Cost per User*
+
+All the code used to run the simulations and create the graphs in this document can be found in the [Lifetimevalue Forecasting](https://github.com/raphaeltamaki/lifetime_value_forecasting) repository. You are invited to change change the *Volume Function* parameters or use other distributions, such as the Pareto, to best fit the marketing situation you seen and find out how much to underbid to obtain maximum expected profitability.
 
 
 ```python

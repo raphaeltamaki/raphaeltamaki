@@ -2,7 +2,7 @@
 
 
 
-Digital advertising is a multi-billion dollar industry, amassing more than \\$380bi in 2022, with just Alphabet and Meta being responsible for \\$234bi [1]. This sizeable digital market is powered by high-performance marketing strategies developed by analysis of the advertisement environment and the Lifetime Value (LTV) estimation of customers. The LTV is arguably the most vital metric to conduct a profitable advertisement strategy because it determines how much we are willing to pay for them. After all, if we pay more than the users are worth, we are effectively losing money. 
+Digital advertising is a multi-billion dollar industry, amassing more than \$380bi in 2022, with just Alphabet and Meta being responsible for \$234bi [1]. This sizeable digital market is powered by high-performance marketing strategies developed by analysis of the advertisement environment and the Lifetime Value (LTV) estimation of customers. The LTV is arguably the most vital metric to conduct a profitable advertisement strategy because it determines how much we are willing to pay for them. After all, if we pay more than the users are worth, we are effectively losing money. 
 
 But while the upper limit for the *Cost per User* is clear, its optimal point is not so readily determined: it depends on how many users we expect to obtain for a given *Cost per User* and how accurate the LTV estimation is. However, forecasting the LTV of marketing campaigns has challenges that are not often seen in machine learning problems:
 1) LTV is zero-inflated since most users who become mobile game players or register as customers in a store never spend a single cent.
@@ -234,7 +234,7 @@ plt.title(
     
 
 
-Each curve can represent different advertisement platforms: the blue curve could be a small platform where most users can already be acquired with a relatively low cost of \\$4, while the red curve can represent a platform with many users and a lot of competition from other advertisers since there are a lot of users we can acquire - as the curve quickly increases after \\$2.
+Each curve can represent different advertisement platforms: the blue curve could be a small platform where most users can already be acquired with a relatively low cost of \$4, while the red curve can represent a platform with many users and a lot of competition from other advertisers since there are a lot of users we can acquire - as the curve quickly increases after \$2.
 
 ## 3- The Profit Curve: how the expected profit varies per *Cost per User*
 
@@ -323,7 +323,7 @@ log_norm_volume_data.sort_values(['expected_value', 'profit']).groupby(['expecte
 
 
 
-While the highest profit isn't relevant when comparing the curves, since we forced all the curves to provide the same number of users at \\$2, the 'shape' is. Notice how the profit curve drawn above is asymmetric around the optimal $Cost_{user}$ for most curves, as the profit quickly drops as the $Cost_{user}$ increases from its optimal point. This asymmetry will be essential to understand why and when the uncertainty on LTV matters.
+While the highest profit isn't relevant when comparing the curves, since we forced all the curves to provide the same number of users at \$2, the 'shape' is. Notice how the profit curve drawn above is asymmetric around the optimal $Cost_{user}$ for most curves, as the profit quickly drops as the $Cost_{user}$ increases from its optimal point. This asymmetry will be essential to understand why and when the uncertainty on LTV matters.
 
 ## 4- The error associated with the predicted LTV
 
@@ -373,7 +373,7 @@ plt.title(
 
 Again, I will reinforce that LTV is a predicted metric, and as such **until proven otherwise, it is what we believe to be true**. That is the case for any metric, but for most metrics, ML models predict, it becomes clear relatively fast if the model was wrong or not. But it can take many months until signs appear of bias in the LTV predictions, which can mean **several thousand, if not tens or hundreds of thousands of dollars, invested in marketing that are not coming back**
 
-For example, assume five different scenarios where we keep the actual LTV at 2 dollars and use the *Volume Function* in orange from the first plot but have the estimated LTV to be \\$1, \\$1.5, \\$2, \\$2.5, or \\ $3. If we know the *Volume Function* and we were to optimize for the predicted expected value of LTV without budget being a constrain, we would operate at the indicated *estimated optimal cpi*, believe we would obtain the *estimated profit* while in practice it would be the *real profit*
+For example, assume five different scenarios where we keep the actual LTV at 2 dollars and use the *Volume Function* in orange from the first plot but have the estimated LTV to be \$1, \$1.5, \$2, \$2.5, or \ $3. If we know the *Volume Function* and we were to optimize for the predicted expected value of LTV without budget being a constrain, we would operate at the indicated *estimated optimal cpi*, believe we would obtain the *estimated profit* while in practice it would be the *real profit*
 
 
 ```python
@@ -473,7 +473,7 @@ We will explain what is happening in a single simulation step-by-step and then s
 We set up the parameters for the simulation
 - `sample_size` defines how many simulations we are doing. In the code it is called sample size because, effectively, each simulation is sampling a value for the LTV error from a normal distribution. In this step we are going to do 2 samples.
 - `standard_deviation_of_ltv_error` defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV.
-- `fraction_of_estimated_ltv` defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of \\$1.0 and the selected fraction is 0.8, we will re-scale the LTV to be \\$0.80 and find the optimal *Cost per User* under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to 'overpay' for the *Volume Functions* used throughout this document
+- `fraction_of_estimated_ltv` defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of \$1.0 and the selected fraction is 0.8, we will re-scale the LTV to be \$0.80 and find the optimal *Cost per User* under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to 'overpay' for the *Volume Functions* used throughout this document
 
 
 ```python
@@ -583,7 +583,7 @@ sim_results
 
 
 
-You can see that we have 2 rows for each `estimated_ltv` as a consequence of the 2 different `ltv_fraction` selected, resulting in the in the estimation of the optimal *Cost per User* `cpi`. This `cpi` is to obtain the actual `profit` you see there. Remeber that for all simulations the actual LTV is held at \\$2.0
+You can see that we have 2 rows for each `estimated_ltv` as a consequence of the 2 different `ltv_fraction` selected, resulting in the in the estimation of the optimal *Cost per User* `cpi`. This `cpi` is to obtain the actual `profit` you see there. Remeber that for all simulations the actual LTV is held at \$2.0
 
 We now calculate which of the LTV fractions gave the highest average profit
 
@@ -638,7 +638,7 @@ bid_optim.bidding_strategy_data
 
 
 
-Which in this case was 0.8, at \\$72.36
+Which in this case was 0.8, at \$72.36
 
 ## 5.2- Simulation
 

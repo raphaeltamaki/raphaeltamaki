@@ -43,21 +43,21 @@ The digital advertisement is rich with methods on how a monetary quantity (a bid
 
 In a digital advertisement, the ultimate goal is to obtain a profit from the marketing campaign, defined as
 
-$$ Profit \triangleq Revenue - Costs$$
+$ Profit \triangleq Revenue - Costs$
 
 , where $Revenue$ and $Cost$ can be further broken down:
 
-$$ Profit = Users * (LTV_{user} - Cost_{user})$$
+$ Profit = Users * (LTV_{user} - Cost_{user})$
 
 , where $Users$ stands for the number of users acquired from the marketing campaign, and $LTV_{user}$ and $Cost_{user}$ for the average LTV and Cost of those users, respectively.
 
 But the number of users acquired from a marketing campaign depends on the digital platform, the advertised product, and how many we will put for a user. We are going to call this relationship *Volume Function* $f\left(Cost_{user}\right)$:
 
-$$ Installs \triangleq f\left(Cost_{user}\right)$$
+$ Installs \triangleq f\left(Cost_{user}\right)$
 
 The resulting $Profit$ function thus becomes:
 
-$$ Profit = f\left(Cost_{user}\right) * (LTV_{user} - Cost_{user})$$
+$ Profit = f\left(Cost_{user}\right) * (LTV_{user} - Cost_{user})$
 
 And if the volume function and $LTV_{user}$ are known, the $Cost_{user}$ that delivers the highest $Profit$ can be found using an optimization function as [scipy.optimize.minimize] in Python. However, as we will show, it is less obvious when $LTV_{user}$ is uncertain.
 
@@ -76,23 +76,23 @@ In the previous section, we introduced the *Volume Function* $f(x)$ but didn't g
 
 While many functions satisfy the requirements above, a simple one is the cumulative probability function of a log-normal distribution multiplied by a constant:
 
-$$f\left(Cost_{user}\right)_{Log-Norm Distribution} = User_{Limit}*CDF_{log-norm}(Cost_{user}, \mu, \sigma)$$
+$f\left(Cost_{user}\right)_{Log-Norm Distribution} = User_{Limit}*CDF_{log-norm}(Cost_{user}, \mu, \sigma)$
 
 
 
 where $CDF_{Log-Norm Distribution}$ refers to the cumulative probability function of a log-normal distribution.
 While $ User_{limit}$ is unknown to the advertiser, it can be estimated from previous marketing campaigns:
 
-$$Install_{Ref} =  User_{Limit}*CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)$$
+$Install_{Ref} =  User_{Limit}*CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)$
 
-$$User_{Limit} = \frac{Install_{Ref}}{CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)}$$
+$User_{Limit} = \frac{Install_{Ref}}{CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)}$
 
 
 We will show for different log-normal distributions how the volume should vary per $Cost_{user}$, and, consequently, the profit curve and the optimal bidding point. For that, we fix the following variables.
 
-$$Cost_{user, reference} = 2$$
-$$E[LTV] = 2$$
-$$Install_{Ref} = 1000$$
+$Cost_{user, reference} = 2$
+$E[LTV] = 2$
+$Install_{Ref} = 1000$
 
 In addition, we will consider four different log-normal distributions for the *Volume Function*, with expected values of 0.5, 1.0, 1.5, and 2 and a standard deviation of 0.5 (for the normal distribution).
 
@@ -333,11 +333,11 @@ The fact that the 'real' LTV is usually too far away in the future means that it
 
 If we estimate the LTV of our users using any conventional machine-learning algorithm, one assumption that these models require is for the residual (basically the error) to be normally distributed. As such, we will assume that the LTV models' error is (1) unbiased and (2) follow a normal distribution.
 
-$$LTV \sim N(\mu, \sigma) $$
+$LTV \sim N(\mu, \sigma) $
 
-$$LTV_{predicted} = LTV + \epsilon$$ 
+$LTV_{predicted} = LTV + \epsilon$ 
 
-$$\epsilon \sim N(0, \delta)$$
+$\epsilon \sim N(0, \delta)$
 
 , where $\epsilon$ is the residual and $\delta$ is its standard devitiation. 
 

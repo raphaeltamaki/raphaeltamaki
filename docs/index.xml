@@ -395,7 +395,12 @@ cpi
 <p>We will explain what is happening in a single simulation step-by-step and then show the results in the end</p>
 <section id="step-by-step-explanation-of-the-simulation" class="level2">
 <h2 class="anchored" data-anchor-id="step-by-step-explanation-of-the-simulation">5.1- Step-by-step explanation of the simulation</h2>
-<p>We set up the parameters for the simulation - <code>sample_size</code> defines how many simulations we are doing. In the code it is called sample size because, effectively, each simulation is sampling a value for the LTV error from a normal distribution. In this step we are going to do 1 sample. - <code>standard_deviation_of_ltv_error</code> defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV. - <code>fraction_of_estimated_ltv</code> defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of $1.0 and the selected fraction is 0.8, we will re-scale the LTV to be $0.80 and find the optimal <em>Cost per User</em> under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to ‘overpay’ for the <em>Volume Functions</em> used throughout this document</p>
+<p>We set up the parameters for the simulation</p>
+<ul>
+<li><code>sample_size</code> defines how many simulations we are doing. In the code it is called sample size because, effectively, each simulation is sampling a value for the LTV error from a normal distribution. In this step we are going to do 1 sample.</li>
+<li><code>standard_deviation_of_ltv_error</code> defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV.</li>
+<li><code>fraction_of_estimated_ltv</code> defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of $1.0 and the selected fraction is 0.8, we will re-scale the LTV to be $0.80 and find the optimal <em>Cost per User</em> under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to ‘overpay’ for the <em>Volume Functions</em> used throughout this document</li>
+</ul>
 <div class="sourceCode" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><span class="im" style="color: #00769E;">from</span> src.BidOptimizer <span class="im" style="color: #00769E;">import</span> StandardBidOptimizer</span>
 <span id="cb18-2"></span>
 <span id="cb18-3">sample_size <span class="op" style="color: #5E5E5E;">=</span> <span class="dv" style="color: #AD0000;">1</span></span>

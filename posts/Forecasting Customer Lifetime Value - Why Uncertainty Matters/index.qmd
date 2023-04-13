@@ -483,9 +483,10 @@ We will explain what is happening in a single simulation step-by-step and then s
 ## 5.1- Step-by-step explanation of the simulation
 
 We set up the parameters for the simulation
+
 - `sample_size` defines how many simulations we are doing. In the code it is called sample size because, effectively, each simulation is sampling a value for the LTV error from a normal distribution. In this step we are going to do 1 sample.
-- `standard_deviation_of_ltv_error` defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV.
-- `fraction_of_estimated_ltv` defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of \$1.0 and the selected fraction is 0.8, we will re-scale the LTV to be \$0.80 and find the optimal *Cost per User* under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to 'overpay' for the *Volume Functions* used throughout this document
+-  `standard_deviation_of_ltv_error` defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV.
+-  `fraction_of_estimated_ltv` defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of \$1.0 and the selected fraction is 0.8, we will re-scale the LTV to be \$0.80 and find the optimal *Cost per User* under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to 'overpay' for the *Volume Functions* used throughout this document
 
 
 ```python

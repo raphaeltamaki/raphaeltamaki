@@ -9,9 +9,9 @@ website:
     right:
       - about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/raphaeltamaki
+      - icon: linkedin
+        href: https://www.linkedin.com/in/raphael-de-brito-tamaki/
 format:
   html:
     theme: litera

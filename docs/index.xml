@@ -670,47 +670,5 @@ ltv_fraction
   <pubDate>Wed, 12 Apr 2023 22:00:00 GMT</pubDate>
   <media:content url="https://raphaeltamaki.github.io/raphaeltamaki/posts/Forecasting Customer Lifetime Value - Why Uncertainty Matters/burning-money.jpg" medium="image" type="image/jpeg"/>
 </item>
-<item>
-  <title>Post With Code</title>
-  <dc:creator>Harlow Malloc</dc:creator>
-  <link>https://raphaeltamaki.github.io/raphaeltamaki/posts/post-with-code/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>This is a post with executable code.</p>
-
-
-
- ]]></description>
-  <category>news</category>
-  <category>code</category>
-  <category>analysis</category>
-  <guid>https://raphaeltamaki.github.io/raphaeltamaki/posts/post-with-code/index.html</guid>
-  <pubDate>Wed, 12 Apr 2023 22:00:00 GMT</pubDate>
-  <media:content url="https://raphaeltamaki.github.io/raphaeltamaki/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Welcome To My Blog</title>
-  <dc:creator>Tristan O'Malley</dc:creator>
-  <link>https://raphaeltamaki.github.io/raphaeltamaki/posts/welcome/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>This is the first post in a Quarto blog. Welcome!</p>
-<p><img src="https://raphaeltamaki.github.io/raphaeltamaki/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
-<p>Since this post doesn’t specify an explicit <code>image</code>, the first image in the post will be used in the listing page of posts.</p>
-
-
-
- ]]></description>
-  <category>news</category>
-  <guid>https://raphaeltamaki.github.io/raphaeltamaki/posts/welcome/index.html</guid>
-  <pubDate>Sun, 09 Apr 2023 22:00:00 GMT</pubDate>
-  <media:content url="https://raphaeltamaki.github.io/raphaeltamaki/posts/welcome/thumbnail.jpg" medium="image" type="image/jpeg"/>
-</item>
 </channel>
 </rss>

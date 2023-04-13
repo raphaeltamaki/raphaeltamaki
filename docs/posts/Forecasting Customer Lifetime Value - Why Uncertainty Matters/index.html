@@ -594,9 +594,13 @@ cpi
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>standard_deviation_of_ltv_error <span class="op">=</span> [<span class="fl">0.4</span>]</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>fraction_of_estimated_ltv <span class="op">=</span> [<span class="fl">0.6</span>, <span class="fl">0.8</span>]</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>avg <span class="op">=</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>We then define the volume model with the previously mentioned</p>
+<p>We then define the volume model with the previously mentioned parameters:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>volume_model <span class="op">=</span> CumulativeLognormalVolume(reference_volume, reference_cpi, avg, <span class="fl">.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>And now we create the bid optimizer object <code>bid_optim</code>. This class has 2 main methods: - <code>simulate()</code>: This method is going to extract samples from the normal distribution, then for each of the selected fractions we multiply the predicted LTV to obtain the adjusted LTV, which then is used as the <em>Cost per User</em>. Finally, the <em>Cost per User</em> is used to calculate the profit. - <code>calculate_bidding_strategy_results()</code>: This method uses the previous output, and calculates for each LTV standard error and fraction, the average profit. Then, for each standard error, it finds which LTV fraction provided the highest average profit</p>
+<p>And now we create the bid optimizer object <code>bid_optim</code>. This class has 2 main methods:</p>
+<ul>
+<li><code>simulate()</code>: This method is going to extract samples from the normal distribution, then for each of the selected fractions we multiply the predicted LTV to obtain the adjusted LTV, which then is used as the <em>Cost per User</em>. Finally, the <em>Cost per User</em> is used to calculate the profit.</li>
+<li><code>calculate_bidding_strategy_results()</code>: This method uses the previous output, and calculates for each LTV standard error and fraction, the average profit. Then, for each standard error, it finds which LTV fraction provided the highest average profit</li>
+</ul>
 <div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>bid_optim <span class="op">=</span> StandardBidOptimizer(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    volume_model, </span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    standard_deviation_of_ltv_error, </span>
@@ -718,8 +722,8 @@ sd
 
 </table>
 </div>
-<p>You can see that we have 2 rows for each <code>estimated_ltv</code> as a consequence of the 2 different <code>ltv_fraction</code> selected, resulting in the in the estimation of the optimal <em>Cost per User</em> <code>cpi</code>. This <code>cpi</code> is to obtain the actual <code>profit</code> you see there. Remeber that for all simulations the actual LTV is held at $2.0</p>
-<p>We now calculate which of the LTV fractions gave the highest average profit</p>
+<p>You can see that we have 2 rows for each <code>estimated_ltv</code> as a consequence of the 2 different <code>ltv_fraction</code> selected, resulting in the predicted optimal <em>Cost per User</em> <code>cpi</code>. This <code>cpi</code> is then used to acquire users and results in the actual <code>profit</code> you see there. Remeber that for all simulations the actual LTV is held at $2.0</p>
+<p>We now calculate which of the LTV fractions gave the highest average profit:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bid_optim.calculate_bidding_strategy_results(sim_results)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>bid_optim.bidding_strategy_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>/Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.

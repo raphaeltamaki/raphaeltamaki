@@ -10,7 +10,7 @@ But while the upper limit for the *Cost per User* is clear, its optimal point is
 3) The distribution of the LTV itself changes over time, requiring the prediction algorithms to adapt quickly.
 4) The marketing industry is constantly changing, with some harming the accuracy of the LTV estimation, such as Apple's App Tracking Transparency (ATT).
 
-In this context, we explain why estimating your users' LTV uncertainty matters to achieve maximum profitability and how that can be accomplished. The **first part** of this series explains one way we can model the digital advertisement environment and how different assumptions of the *Volume Function* impact the optimal bidding strategy when we have uncertainty on our LTV estimates (which is always).
+In this context, we explain why estimating your users' LTV uncertainty matters to achieve maximum profitability and how that can be accomplished. The **first part** of this series explains one way we can model the digital advertisement environment and how different assumptions for how the number of acquire users increases as we increase our 'bid' impact the optimal bidding strategy when there is uncertainty on LTV estimates.
 
 In the **second part**, we introduce a code to forecast the LTV of the marketing campaigns using PySTAN. PySTAN is a Python interface to STAN, a package for Bayesian inference capable of high-performance statistical computation. This computation speed is essential in a marketing context, where we need to predict the LTV of multiple marketing campaigns over a long period while estimating the LTV distribution. We demonstrate how to implement a PySTAN model to predict a time series using the [Lifetime Value data from Kaggle](https://www.kaggle.com/datasets/baetulo/lifetime-value?resource=download) in less than 2 minutes. This data contains user-level information of customers joining a website, such as their country, credit card level, a product acquired when they entered the website, short-term value, and (of course) their lifetime value. We transform this user-level data into segment-level by grouping users to simulate a marketing campaign. We finish by explaining how to implement the equivalent model in PyMC, a probabilistic programming library for Python, and comparing the pros and cons of both alternatives.
 
@@ -109,6 +109,7 @@ from typing import List
 from src.VolumeAcquisition import CumulativeLognormalVolume
 
 sns.set_style('whitegrid')
+rng = np.random.default_rng(42)
 PLOT_WITHD_INCHES = 20
 PLOT_HEIGHT_INCHES = 10
 ```
@@ -128,7 +129,6 @@ cpi_range = np.linspace(0.001, 6.5, 1000) # we want to consider cost per user be
 ```python
 def generate_marketing_properties(
     cpi_range: list, 
-    volume_class, 
     lognormal_expected_values: List[float],
     reference_volume: int,
     reference_cpi: float,
@@ -142,7 +142,7 @@ def generate_marketing_properties(
     output_data = []
     for exp_value in lognormal_expected_values:
         # define how the volume behaves
-        volume_model = volume_class(reference_volume, reference_cpi, average=exp_value, standard_deviation=0.5)
+        volume_model = CumulativeLognormalVolume(reference_volume, reference_cpi, average=exp_value, standard_deviation=0.5)
         
         # calculate volume, and cdf for diferent cpis
         volume = volume_model.calculate_volume(cpi_range)
@@ -170,7 +170,6 @@ def generate_marketing_properties(
 # generate the volume and profit curves for our scenarios and store them in a pd.DataFrame
 log_norm_volume_data = generate_marketing_properties(
     cpi_range,
-    CumulativeLognormalVolume,
     lognormal_exp_values,
     reference_volume,
     reference_cpi,
@@ -330,7 +329,7 @@ While the highest profit isn't relevant when comparing the curves, since we forc
 
 With the clear connection between *Cost per User* and profit, we can focus on LTV. The Lifetime Value of a user is, by definition, how much revenue a user generates in their lifetime, in other words, from the moment they started their 'life' as a user of a product until infinity. But we can't use infinity in practice, in good part because we need a target to train the machine-learning models, so the lifetime value is usually defined as just a date 'sufficiently away' in the future.
 
-The fact that the 'real' LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are unsure of its exact value.
+The fact that the 'real' LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are sure of its exact value.
 
 If we estimate the LTV of our users using any conventional machine-learning algorithm, one assumption that these models require is for the residual (basically the error) to be normally distributed. As such, we will assume that the LTV models' error is (1) unbiased and (2) follow a normal distribution.
 
@@ -372,7 +371,7 @@ plt.title(
     
 
 
-Again, I will reinforce that LTV is a predicted metric, and as such **until proven otherwise, it is what we believe to be true**. That is the case for metric predicted by ML models, but for most cases, it becomes clear relatively fast if the model is wrong or not. But in the LTV , it can take many months until signs appear of bias predictions, which can mean overbidding in marketing campaigns, resulting in **several thousand, if not tens or hundreds of thousands of dollars, invested in marketing that are not coming back**.
+Again, I will reinforce that LTV is a predicted metric, and as such **until proven otherwise, it is what we believe to be true**. That is the case for any metric, but for most metrics, ML models predict, it becomes clear relatively fast if the model was wrong or not. But it can take many months until signs appear of bias in the LTV predictions, which can mean **several thousand, if not tens or hundreds of thousands of dollars, invested in marketing that are not coming back**
 
 For example, assume five different scenarios where we keep the actual LTV at 2 dollars and use the *Volume Function* in orange from the first plot but have the estimated LTV to be \\$1, \\$1.5, \\$2, \\$2.5, or \\ $3. If we know the *Volume Function* and we were to optimize for the predicted expected value of LTV without budget being a constrain, we would operate at the indicated *estimated optimal cpi*, believe we would obtain the *estimated profit* while in practice it would be the *real profit*
 
@@ -384,7 +383,6 @@ estimated_optimal_cpi = []
 for ltv in possible_ltvs:
     marketing_data = generate_marketing_properties(
         cpi_range,
-        CumulativeLognormalVolume,
         fixed_cpi,
         reference_volume,
         reference_cpi,
@@ -421,15 +419,13 @@ This behavior can be better understood when we plot the profit distribution when
 
 ```python
 # See how the distribution of the profit is, when we are wrong about the LTV
-from src.BidOptimizer import StandardBidOptimizer
-
+from src.ProfitModel import StandardModel
 volume_model = CumulativeLognormalVolume(reference_volume, reference_cpi, average=1, standard_deviation=0.5)
-bid_optim = StandardBidOptimizer(
-    volume_model, 
-    std_values=[ltv_error_std], 
-    ltv_fractions=[1])
-bid_optim.simulate()
-profit_distribution = bid_optim.results['profit']
+profit_model = StandardModel(volume_model, lifetime_value=2)
+
+# calculate the profit
+cpis = rng.normal(reference_ltv, reference_ltv*ltv_error_std, 10000)
+profit_distribution = profit_model.calculate_profit(cpis)
 
 grid = sns.histplot(profit_distribution)
 grid.figure.set_size_inches(PLOT_WITHD_INCHES, PLOT_HEIGHT_INCHES)
@@ -443,7 +439,7 @@ plt.title(
 
 
 
-    Text(0.0, 1.0, 'Distribution of the profit when the LTV error is normally distributed with average 0 and standard deviation equal to 0.8')
+    Text(0.0, 1.0, 'Distribution of the profit when the LTV error is normally distributed with average 0 and standard deviation equal to 1.0')
 
 
 
@@ -457,68 +453,255 @@ While one may think that a 50\% error for a prediction is too high, that is quit
 
 # 5- Bidding Strategy
 
-Under circumstances where LTV is uncertain, how should we adapt our bidding strategy to maximize the actual profit? A straightforward approach is **bidding a fraction of the estimated LTV**. The challenge is what fraction is ideal under each circumstance. 
+A straightforward approach is **bidding a fraction of the estimated LTV**. The challenge is what fraction is ideal under each circumstance. 
 
-For that goal, we simulate the previous situation 10000 for each combination of LTV uncertainty, defined by the standard deviation of the error, and *Volume Function* while always assuming that our LTV is unbiased. In each simulation, we
-1) sample the LTV error from a normal distribution, with an expected value of 0 and standard deviation being a fraction from 0 to 0.4 of the actual LTV
-2) we multiply the estimated LTV by a fraction of the LTV, which can be from 0.3 to 1.2, and define it as the new estimated LTV
-3) with this LTV and the knowledge of the *Volume Function*, we estimate the optimal *Cost per User*
+
+For that goal, we simulate the previous scenario 5000 times for each combination of LTV uncertainty (defined by the standard deviation of the error), and *Volume Function*, while always assuming that our LTV is unbiased. In each simulation, we
+
+1) sample the predicted LTV from a normal distribution, with an expected value of being the actual LTV and standard deviation being a fraction from 0 to 0.4 of the it
+2) we multiply the estimated LTV by a fraction, which can be from 0.3 to 1.2, and define it as a new estimated LTV
+3) with this new predicted LTV and the knowledge of the *Volume Function*, we estimate the optimal *Cost per User* 
 4) we use this *Cost per User* and obtain the actual profit
 5) We calculate the average profit for each (Error Standard Deviation, *Volume Function*, LTV Fraction)
 6) Then we see which LTV fraction provides the highest average profit for each (Error Standard Deviation, *Volume Function*)
 
 
+We will explain what is happening in a single simulation step-by-step and then show the results in the end
+
+## 5.1- Step-by-step explanation of the simulation
+
+We set up the parameters for the simulation
+- `sample_size` defines how many simulations we are doing. In the code it is called sample size because, effectively, each simulation is sampling a value for the LTV error from a normal distribution. In this step we are going to do 2 samples.
+- `standard_deviation_of_ltv_error` defines the range considered for the simulation for the standard error of LTV. This value is relative to the expected LTV.
+- `fraction_of_estimated_ltv` defines the fraction of the predicted LTV we use to bid. So if we predicted a LTV of \\$1.0 and the selected fraction is 0.8, we will re-scale the LTV to be \\$0.80 and find the optimal *Cost per User* under this scenario. While we state it is a fraction, we include values greater than 1 just to demonstrate that it is never better to 'overpay' for the *Volume Functions* used throughout this document
 
 
 ```python
-sample_size = 10000
+from src.BidOptimizer import StandardBidOptimizer
+
+sample_size = 1
+standard_deviation_of_ltv_error = [0.4]
+fraction_of_estimated_ltv = [0.6, 0.8]
+avg = 2
+```
+
+We then define the volume model with the previously mentioned 
+
+
+```python
+volume_model = CumulativeLognormalVolume(reference_volume, reference_cpi, avg, .5)
+```
+
+And now we create the bid optimizer object `bid_optim`. This class has 2 main methods:
+- `simulate()`: This method is going to extract samples from the normal distribution, then for each of the selected fractions we multiply the predicted LTV to obtain the adjusted LTV, which then is used as the *Cost per User*. Finally, the *Cost per User* is used to calculate the profit.
+- `calculate_bidding_strategy_results()`: This method uses the previous output, and calculates for each LTV standard error and fraction, the average profit. Then, for each standard error, it finds which LTV fraction provided the highest average profit
+
+
+```python
+bid_optim = StandardBidOptimizer(
+    volume_model, 
+    standard_deviation_of_ltv_error, 
+    fraction_of_estimated_ltv, 
+    reference_ltv_value=2.0,
+    sample_size=sample_size)
+
+```
+
+
+```python
+# simulate the 2 scenarions (because we set sample_size to 2)
+sim_results = bid_optim.simulate()
+
+# see the output from the simulation:
+sim_results
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>estimated_ltv</th>
+      <th>ltv_fraction</th>
+      <th>cpi</th>
+      <th>profit</th>
+      <th>sd</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2.121887</td>
+      <td>0.6</td>
+      <td>1.131382</td>
+      <td>16.937414</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.121887</td>
+      <td>0.8</td>
+      <td>1.484203</td>
+      <td>76.374987</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.584006</td>
+      <td>0.6</td>
+      <td>0.855907</td>
+      <td>2.074194</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.584006</td>
+      <td>0.8</td>
+      <td>1.126308</td>
+      <td>16.435281</td>
+      <td>0.4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+You can see that we have 2 rows for each `estimated_ltv` as a consequence of the 2 different `ltv_fraction` selected, resulting in the in the estimation of the optimal *Cost per User* `cpi`. This `cpi` is to obtain the actual `profit` you see there. Remeber that for all simulations the actual LTV is held at \\$2.0
+
+We now calculate which of the LTV fractions gave the highest average profit
+
+
+```python
+bid_optim.calculate_bidding_strategy_results(sim_results)
+bid_optim.bidding_strategy_data
+```
+
+    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+      self.bidding_strategy_data = self.bidding_strategy_data.groupby('sd')['mean_profit', 'std_profit', 'ltv_fraction'].first().reset_index()
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sd</th>
+      <th>mean_profit</th>
+      <th>std_profit</th>
+      <th>ltv_fraction</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.4</td>
+      <td>46.405134</td>
+      <td>29.969853</td>
+      <td>0.8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Which in this case was 0.8, at \\$72.36
+
+## 5.2- Simulation
+
+Now that it is clear what is happening, we can find for each of the *Volume Functions* from before and for different levels of LTV standard error, which fraction gives the highest average profit
+
+
+```python
+sample_size = 5000
 standard_deviation_of_ltv_error = np.linspace(0.001, 0.4, 10)
 fraction_of_estimated_ltv = np.linspace(0.3, 1.2, 20)
+```
 
+
+```python
 output_data = []
+# for each distribution of the Volume Function
 for avg in lognormal_exp_values:
+    # set up the volume model
     volume_model = CumulativeLognormalVolume(reference_volume, reference_cpi, avg, .5)
+    
+    # set up the class that will sample the standard error, and calculate the resulting bid and profit
     bid_optim = StandardBidOptimizer(
         volume_model, 
         standard_deviation_of_ltv_error, 
         fraction_of_estimated_ltv, 
         sample_size=sample_size)
-    bid_optim.run()
+    
+    # run the N=sample_size simulations
+    sim_results = bid_optim.simulate()
+    
+    # calculate which LTV fraction gave the highest average profit for each LTV standard error level
+    bid_optim.calculate_bidding_strategy_results(sim_results)
+    
+    # store the results
     bid_optim.bidding_strategy_data['lognormal_avg'] = avg
     output_data.append(bid_optim.bidding_strategy_data)
 ```
 
-    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:69: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
       self.bidding_strategy_data = self.bidding_strategy_data.groupby('sd')['mean_profit', 'std_profit', 'ltv_fraction'].first().reset_index()
-    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:69: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
       self.bidding_strategy_data = self.bidding_strategy_data.groupby('sd')['mean_profit', 'std_profit', 'ltv_fraction'].first().reset_index()
-    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:69: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
       self.bidding_strategy_data = self.bidding_strategy_data.groupby('sd')['mean_profit', 'std_profit', 'ltv_fraction'].first().reset_index()
-    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:69: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+    /Users/raphaeltamaki/Documents/personal_git/lifetime_value_forecasting/src/BidOptimizer.py:80: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
       self.bidding_strategy_data = self.bidding_strategy_data.groupby('sd')['mean_profit', 'std_profit', 'ltv_fraction'].first().reset_index()
 
 
 
 ```python
 plot_data = pd.concat(output_data)
-
 plot_data['lognormal_avg'] = plot_data['lognormal_avg'].astype(str)
-plot_data = plot_data.sort_values(['lognormal_avg', 'sd'])
-temp_data = plot_data.groupby(['lognormal_avg'])['ltv_fraction'].max().reset_index()
-plot_data = pd.merge(plot_data, temp_data, on=['lognormal_avg'])
-plot_data['cpi_frac'] = plot_data['ltv_fraction_x'] / plot_data['ltv_fraction_y']
-
 
 grid = sns.relplot(plot_data, 
                    x='sd', 
-                   y='cpi_frac', 
+                   y='ltv_fraction', 
                    hue='lognormal_avg', 
                    kind='line', 
                    facet_kws={'ylim': [0, 1.1]}
                   )
 grid.figure.set_size_inches(PLOT_WITHD_INCHES, PLOT_HEIGHT_INCHES)
 plt.title(
-    'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus mean for log-normal distribution', 
+    'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus mean for log-normal distribution',
     font='Avenir', 
     fontsize=24, 
     loc='left')
@@ -527,17 +710,49 @@ plt.title(
 
 
 
-    Text(0.0, 1.0, 'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus expected CPI for the log-normal distribution')
+    Text(0.0, 1.0, 'Fraction of Cost per User with highest average profit when there is not uncertainty (Y) versus error level of LTV (X), versus mean for log-normal distribution')
 
 
 
 
     
-![png](output_27_1.png)
+![png](output_40_1.png)
     
 
 
-As expected, the greater the uncertainty of LTV, the more 'conservative' we should be on our marketing strategy. But that doesn't only depend on the LTV uncertainty itself but also on the *Volume Function*. For *Volume Functions* where the profit curve is highly asymmetric around the optimal *Cost per User*, such as when $lognormal_{avg}$ is 2 (red), even for a slight standard error of 0.1 we already have to bid less than the expected optimal point. However, we don't need to be as conservative when the Profit Curve is more symmetric (or the volume doesn't increase as fast).
+
+```python
+grid = sns.relplot(plot_data, 
+                   x='sd', 
+                   y='mean_profit', 
+                   hue='lognormal_avg', 
+                   kind='line',
+                   facet_kws={'ylim': [0, 400]}
+                  )
+grid.figure.set_size_inches(PLOT_WITHD_INCHES, PLOT_HEIGHT_INCHES)
+plt.title(
+    'Average profit from the optimal LTV fraction strategy (Y) versus error level of LTV (X), versus mean for log-normal distribution',
+    font='Avenir', 
+    fontsize=24, 
+    loc='left')
+```
+
+
+
+
+    Text(0.0, 1.0, 'Average profit from the optimal LTV fraction strategy (Y) versus error level of LTV (X), versus mean for log-normal distribution')
+
+
+
+
+    
+![png](output_41_1.png)
+    
+
+
+As expected, the greater the uncertainty of LTV, the more 'conservative' we should be on our marketing strategy. But that doesn't only depend on the LTV uncertainty itself but also on the *Volume Function*. For *Volume Functions* where the profit curve is highly asymmetric around the optimal *Cost per User*, such as when $lognormal_{avg}$ is 2 (red), even for a slight standard error of 0.1 we already have to bid less than the expected optimal point. However, we don't need to be as conservative when the Profit Curve is more symmetric (i.e. the volume doesn't increase as fast).
+
+Notice also how the profit curve decreases similarly for all *Volume Functions* from where LTV error is close to 0 to where it is close to 0.4. However, the **relative profit loss** is much higher when the volume increase fast. While the loss for $lognormal_{avg}$ equal to 0.5 (blue) from the two extremes is less than 9%, for $lognormal_{avg}$ equal to 2 (red) the loss is 48%. That is a result from the need to bid further away from the optimal point and from the higher losses, when we overbid.
 
 # 6- Conclusion
 

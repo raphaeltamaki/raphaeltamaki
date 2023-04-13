@@ -1,0 +1,21 @@
+project:
+  type: website
+
+website:
+  title: "Raphael Tamaki's Blog"
+  site-url: https://raphaeltamaki.github.io/raphaeltamaki/
+  description: "Personal blog on (data) science topic applied in different subject areas"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/
+      - icon: twitter
+        href: https://twitter.com
+format:
+  html:
+    theme: litera
+    css: styles.css
+
+
+

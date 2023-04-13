@@ -16,4 +16,5 @@ about:
 
 ---
 
-About this blog
+This is my personal blog, where I share some thoughts in topics I have experience or interest in.
+Feel free to reach out to me in LinkedIn or on my email

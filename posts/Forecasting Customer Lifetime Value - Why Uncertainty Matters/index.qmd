@@ -14,7 +14,7 @@ Are you bidding right on your marketing campaigns?
 
 
 
-Digital advertising is a multi-billion dollar industry, amassing more than \$380bi in 2022, with just Alphabet and Meta being responsible for \$234bi [1]. This sizeable digital market is powered by high-performance marketing strategies developed by analysis of the advertisement environment and the Lifetime Value (LTV) estimation of customers. The LTV is arguably the most vital metric to conduct a profitable advertisement strategy because it determines how much we are willing to pay for them. After all, if we pay more than the users are worth, we are effectively losing money. 
+Digital advertising is a multi-billion dollar industry, amassing more than \$380bi in 2022, with just [Alphabet and Meta being responsible for \$234bi](https://mobiledevmemo.com/the-duopoly-is-over-because-everything-is-an-ad-network/). This sizeable digital market is powered by high-performance marketing strategies developed by analysis of the advertisement environment and the Lifetime Value (LTV) estimation of customers. The LTV is arguably the most vital metric to conduct a profitable advertisement strategy because it determines how much we are willing to pay for them. After all, if we pay more than the users are worth, we are effectively losing money. 
 
 But while the upper limit for the *Cost per User* is clear, its optimal point is not so readily determined: it depends on how many users we expect to obtain for a given *Cost per User* and how accurate the LTV estimation is. However, forecasting the LTV of marketing campaigns has challenges that are not often seen in machine learning problems:
 1) LTV is zero-inflated since most users who become mobile game players or register as customers in a store never spend a single cent.
@@ -47,6 +47,7 @@ The rest of this document is organized into the following sections:
 4) **The error associated with the predicted LTV**: with the marketing model defined, we only need to determine the error associated with LTV. We assume it to be normally distributed around 0 and explain why that is a reasonable assumption
 5) **The optimal bidding strategy under uncertainty**: finally, we demonstrate how the error of  LTV impacts the profitability of marketing campaigns and demonstrate which bidding strategy outperforms for different levels of LTV error and *Volume Functions*
 6) **Conclusion**: we reinforce the reasons why estimating the uncertainty of LTV is vital to achieve high profitability in marketing campaigns and which strategy one should follow for each situation
+7) **References**
 
 
 ## 1- Modelling digital advertisement
@@ -777,7 +778,6 @@ As a consequence of this asymmetry, overestimation in the context of LTV predict
 Consequently, operating at a Cost per User below the expected optimum point is often beneficial. How much below it will depend on both the accuracy of the LTV predictions and how many more users can be acquired by an increase in the *Cost per User*
 
 All the code used to run the simulations and create the graphs in this document can be found in the [Lifetimevalue Forecasting](https://github.com/raphaeltamaki/lifetime_value_forecasting) repository. You are invited to change change the *Volume Function* parameters or use other distributions, such as the Pareto, to best fit the marketing situation you see and find out how much to underbid to obtain maximum expected profitability.
-
 
 ```python
 

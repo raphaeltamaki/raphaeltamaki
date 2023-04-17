@@ -269,7 +269,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>While many functions satisfy the requirements above, a simple one is the cumulative probability function of a log-normal distribution multiplied by a constant:</p>
 <p><span class="math display">\[f\left(Cost_{user}\right)_{Log-Norm Distribution} = User_{Limit}*CDF_{log-norm}(Cost_{user}, \mu, \sigma)\]</span></p>
-<p>where <span class="math inline">\(CDF_{Log-Norm Distribution}\)</span> refers to the cumulative probability function of a log-normal distribution. While $ User_{limit}$ is unknown to the advertiser, it can be estimated from previous marketing campaigns:</p>
+<p>where <span class="math inline">\(CDF_{Log-Norm Distribution}\)</span> refers to the cumulative probability function of a log-normal distribution. While <span class="math inline">\(User_{limit}\)</span> is unknown to the advertiser, it can be estimated from previous marketing campaigns:</p>
 <p><span class="math display">\[Install_{Ref} =  User_{Limit}*CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)\]</span></p>
 <p><span class="math display">\[User_{Limit} = \frac{Install_{Ref}}{CDF_{log-norm}(Cost_{user, reference}, \mu, \sigma)}\]</span></p>
 <p>We will show for different log-normal distributions how the volume should vary per <span class="math inline">\(Cost_{user}\)</span>, and, consequently, the profit curve and the optimal bidding point. For that, we fix the following variables.</p>
@@ -447,7 +447,7 @@ cpi
 <section id="the-error-associated-with-the-predicted-ltv" class="level2">
 <h2 class="anchored" data-anchor-id="the-error-associated-with-the-predicted-ltv">4- The error associated with the predicted LTV</h2>
 <p>With the clear connection between <em>Cost per User</em> and profit, we can focus on LTV. The Lifetime Value of a user is, by definition, how much revenue a user generates in their lifetime, in other words, from the moment they started their ‘life’ as a user of a product until infinity. But we can’t use infinity in practice, in good part because we need a target to train the machine-learning models, so the lifetime value is usually defined as just a date ‘sufficiently away’ in the future.</p>
-<p>The fact that the ‘real’ LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are sure of its exact value.</p>
+<p>The fact that the ‘real’ LTV is usually too far away in the future means that it cannot be used for practically any critical decision within a company. This means that the LTV used for such decisions will be an estimate, and as an estimate, we are never sure of its exact value.</p>
 <p>If we estimate the LTV of our users using any conventional machine-learning algorithm, one assumption that these models require is for the residual (basically the error) to be normally distributed. As such, we will assume that the LTV models’ error is (1) unbiased and (2) follow a normal distribution.</p>
 <p><span class="math display">\[LTV \sim N(\mu, \sigma) \]</span></p>
 <p><span class="math display">\[LTV_{predicted} = LTV + \epsilon\]</span></p>

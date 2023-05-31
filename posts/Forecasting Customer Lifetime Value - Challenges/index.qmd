@@ -16,12 +16,14 @@ On the first topic of this series, I explained [Why Uncertainty Matters](https:/
 Initially, I was going to demonstrate in this part one way to estimate LTV with confidence intervals. However, I found this was not sufficiently interesting for people who work on this domain, even if I demonstrated using PySTAN. While I did write one notebook instructing how one can predict LTV with uncertainty estimates using XGBoost and PySTAN, which you can see [in this notebook](https://github.com/raphaeltamaki/lifetime_value_forecasting/blob/main/Forecasting%20Customer%20Lifetime%20Value%20-%20Forecasting%20LTV.ipynb), I decided to be more enriching in discussing problems that teams building Lifetime Value prediction models encounter.
 
 This will be a growing section, but for now there are the following topics:
+
 - **One model to rule them all?** LTV predictions can be used for different use cases. Should we have one model for all use cases or one for each?
 - **Should you be using a supervised approach at all?** When LTV predictions are used for marketing, it creates a feedback loop where the model influences the future data it is trained in, similar to what happens in Reinforcement Learning. Is supervised learning appropriate for this situation?
 
 ## 1- One model to rule them all?
 
 One of the most significant benefits of working with LTV estimation is the vast impact that it can have across the company. After all, the Lifetime Value can be used for different goals, such as:
+
 - prioritizing which product a company should focus on: the greater the (potential) profit a product has, the greater focus the company should have on it
 - forecasings the cash flow of the following months, thus predicting the financial health of the company
 - directly influencing marketing by estimating the profitability of endeavors of the marketing team. With an accurate Lifetime Value estimation, the marketing team can quickly scale winning strategies and cut back on the approaches that are not worth it.
@@ -29,6 +31,7 @@ One of the most significant benefits of working with LTV estimation is the vast 
 But this broad impact of Lifetime Value estimation is a double-edged sword because each of those areas has its own needs and definition of an optimum model, which means that a change in the model can have opposite impact on distinct areas. One example is a change that worsens predictions for older users but improves predictions for newer users. This change is positive for the Marketing Team since they mostly care about the prediction for recent users, who were likely acquired by a marketing campaign so that they can better adjust their campaigns bid. On the other hand, the Product Team will oppose such change since older users form the most extensive user base of a product, and worsening the LTV on them may mean applying product changes that are detrimental to the existing users.
 
 This challenge has been previously explored in [Pitfalls of Modeling LTV and How to Overcome Them](https://liftoff.io/blog/pitfalls-of-modeling-ltv-and-how-to-overcome-them/) from Algolift (now Liftoff). There it brings four dimensions that may be different depending on the use cases: Stability, Accuracy, Temporal granularity, and Cohort granularity:
+
 - **Stability**: What is a reasonable forecast update frequency? Frequent changes indicates inaccuracy. However, ignoring real surprising behavior that strongly changes LTV is also undesirable.”
 - **Accuracy**: What are an acceptable level of variance (sample size) and bias (model sophistication)?
 - **Temporal granularity**: How soon after installation does the forecast come? Is a cohort a week or a month? Different teams care about different temporal granularity and responsiveness.

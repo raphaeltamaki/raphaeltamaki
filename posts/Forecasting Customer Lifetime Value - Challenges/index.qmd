@@ -28,7 +28,7 @@ One of the most significant benefits of working with LTV estimation is the vast 
 - forecasings the cash flow of the following months, thus predicting the financial health of the company
 - directly influencing marketing by estimating the profitability of endeavors of the marketing team. With an accurate Lifetime Value estimation, the marketing team can quickly scale winning strategies and cut back on the approaches that are not worth it.
 
-But this broad impact of Lifetime Value estimation is a double-edged sword because each of those areas has its own needs and definition of an optimum model, which means that a change in the model can have opposite impact on distinct areas. One example is a change that worsens predictions for older users but improves predictions for newer users. This change is positive for the Marketing Team since they mostly care about the prediction for recent users, who were likely acquired by a marketing campaign so that they can better adjust their campaigns bid. On the other hand, the Product Team will oppose such change since older users form the most extensive user base of a product, and worsening the LTV on them may mean applying product changes that are detrimental to the existing users.
+But this broad impact of Lifetime Value estimation is a double-edged sword because each of those areas has its own needs and definition of an optimum model, which means that a change in the model can have opposite impact on distinct areas. For example, a new data source with up-to-date device information might improve predictions for new users but worsen predictions for older users whose devices are not well covered in the database. This change is positive for the Marketing Team since they mostly care about the prediction for recent users, who were likely acquired by a marketing campaign so that they can better adjust their campaigns bid. On the other hand, the Product Team will oppose such change since older users form the most extensive user base of a product, and worsening the LTV on them may mean applying product changes that are detrimental to the existing users.
 
 This challenge has been previously explored in [Pitfalls of Modeling LTV and How to Overcome Them](https://liftoff.io/blog/pitfalls-of-modeling-ltv-and-how-to-overcome-them/) from Algolift (now Liftoff). There it brings four dimensions that may be different depending on the use cases: Stability, Accuracy, Temporal granularity, and Cohort granularity:
 
@@ -74,7 +74,7 @@ With the issues raised before on having multiple LTV models, the best solution a
 But to take a stance on this topic, most companies should benefit from having a single machine-learning code-base for the LTV. Based the 4 dimensions brought by AlgoLift and an additional we touched before, I argue that one model (or at least one code base) is frequently the best solution:
 
 
-- **Temporal and Cohort Granularity (AlgoLift)**: The granularity on how LTV predictions are consumed can be easily accommodated by adding a step that adjusts depending on the need. When the LTV Model predictions are more granular or as granular than what any stakeholder requires, a grouping step
+- **Temporal and Cohort Granularity (AlgoLift)**: The granularity on how LTV predictions are consumed can be easily accommodated by adding a step that adjusts depending on the need. When the LTV Model predictions are more granular or as granular than what any stakeholder requires, we can add a post-processing step where we group predictions at the desired granularity of each use case.
 - **Stability (AlgoLift)**: as shown before, Product and Accounting may require that predictions are constant through time: once something is predicted, it doesn't change any more. Keeping projections constant can also be solved by creating a mutable and immutable version of LTV predictions. 
 - **Accuracy (AlgoLift)**: While clients can have different goals for the LTV model to optimize, most often, they will not cause divergence. For example, the Product cares for directional changes and Marketing Automation for the absolute values. If the LTV model doesn't follow the changes, it will be biased and won't satisfy the requirement for marketing.
 - **Iteration speed**: the most potent argument for having multiple models is the ability to implement changes quickly. When a company has numerous different products with unique user bases and particularities, having more than one model can be better. Still, the various models should share many similarities, and I'm in favor of sharing as much code as possible between the models and periodically attempting to unify them. Quite often, the solutions particular to one case are because we need to understand the underlying mechanism properly. When we do, we can find a solution that i s beneficial for all use cases.
@@ -251,8 +251,8 @@ However, this is not a problem that always occurs. It only happens when the bids
 
 | Period | True LTV | Predicted LTV (A) | Predicted LTV (B) | CPI (A) | CPI (B) | Users (A) | Users (B) | True Revenue (A+B) | Predicted Revenue (A+B) | Bias | Cost   | Profit |
 |--------|----------|-------------------|-------------------|---------|---------|-----------|-----------|--------------------|-------------------------|------|--------|--------|
-| Period 1 | 2 | \$3 | \$1 | \$1.50 | \$0.50 | 100 | 100 | \$400 | \$400 | 0% | \$200.00 | \$200 |
-| Period 2 | 2 | \$3 | \$1 | \$1.50 | \$0.50 | 100 | 100 | \$400 | \$400 | 0% | \$200.00 | \$200 |
+| Period 1' | 2 | \$3 | \$1 | \$1.50 | \$0.50 | 100 | 100 | \$400 | \$400 | 0% | \$200.00 | \$200 |
+| Period 2' | 2 | \$3 | \$1 | \$1.50 | \$0.50 | 100 | 100 | \$400 | \$400 | 0% | \$200.00 | \$200 |
 
 
 However, this is an unlikely situation in practice, especially for digital products. The LTV of the recent users varies a lot and quite often, be it because of internal product changes (ex: promotions and feature releases) or because of macro influences (ex: summer vacation). Consequently, the bid used in a marketing campaign needs to be constantly adjusted, and the problem shown before appears.
@@ -263,7 +263,7 @@ Let’s go back to the first case and suppose that we notice the bias after some
 | Period | True LTV | Predicted LTV (A) | Predicted LTV (B) | CPI (A) | CPI (B) | Users (A) | Users (B) | True Revenue (A+B) | Predicted Revenue (A+B) | Bias | Cost   | Profit |
 |--------|----------|-------------------|-------------------|---------|---------|-----------|-----------|--------------------|-------------------------|------|--------|--------|
 | Period 2 | 2 | \$2.50 | \$1.50 | \$1.50 | \$0.50 | 150 | 50 | \$400 | \$450 | 13% | \$250.00 | \$150 |
-| Period 3 | 2 | \$2.50 | \$1.50 | \$1.25 | \$0.75 | 125 | 75 | \$400 | \$425 | 6% | \$212.50 | \$188 |
+| Period 3' | 2 | \$2.50 | \$1.50 | \$1.25 | \$0.75 | 125 | 75 | \$400 | \$425 | 6% | \$212.50 | \$188 |
 
 
 In this situation, the retraining of the model helped make it less biased and increase profits. But notice that we didn’t negate the bias. We only decreased it. What if we tried to zero the bias? Unless we perfectly predicted each audience - which is extremely unlikely, and if achieved, is most likely due to overfitting - then you may have ‘overcorrected’ it:
@@ -285,7 +285,7 @@ $$MSE_{period\ 2,\ initial predictions} =\frac{\left(150*3 - 150*2\right)^2 + \l
 $$MSE_{period\ 2,\ new predictions} = \frac{(\left(150*1.5 - 150*2\right)^2 + \left(50*3.5 - 50*2\right)^2}{2} = 5625$$
 
 
-So while it may be initially unintuitive, having your models constantly updated on the most recent data and aiming for no bias may keep the bias present in the model, just alternating the contributors to the bias.
+This means that when we update our model and evaluate its performance regarding both bias and variance, we would conclude that the new model predictions are better. But these 'better' predictions would lead us to bid in a way that would lead to lesser profit. So while it may be initially unintuitive, having your models constantly updated on the most recent data and aiming for no bias may keep the bias present in the model, just alternating the contributors to the bias.
 
 ### 2.2- Solving the ‘overcorrection’
 
@@ -297,9 +297,31 @@ A better solution is to **keep the use-base proportion constant**. Instead of di
 
 Take the example from before where we ‘overcorrected’ for the bias. In that case, not only did we remove the bias, but we also decreased the variance (as per the MSE). If we were instead to use the number of users (or proportion of users) from the previous period, we would see both an actual increase in bias and variance:
 
-$$MSE_{period\ 1,\ initial predictions} =\frac{\left(100*3 - 100*2\right)^2 + \left(100*1 - 100*2\right)^2}{2} = 10000$$
+$$MSE_{period\ 1,\ initial\ predictions} =\frac{\left(100*3 - 100*2\right)^2 + \left(100*1 - 100*2\right)^2}{2} = 10000$$
 
-$$MSE_{period\ 1,\ new predictions} = \frac{(\left(100*1.5 - 100*2\right)^2 + \left(100*3.5 - 100*2\right)^2}{2} = 12500$$
+$$MSE_{period\ 1,\ new\ predictions} = \frac{(\left(100*1.5 - 100*2\right)^2 + \left(100*3.5 - 100*2\right)^2}{2} = 12500$$
+
+$$Bias = \frac{{Total Revenue}_{Predicted}}{{Total Revenue}_{Observed}} - 1$$
+
+$$Bias_{period\ 1,\ initial\ predictions} =\frac{100*3 + 100*1}{100*2 + 100*2} - 1 = 0\%$$
+
+$$Bias_{period\ 1,\ new\ predictions} =\frac{100*1.5 + 100*3.5}{100*2 + 100*2} - 1 = 25\%$$
+
+Notice that now the *new predictions* are worse than the *initial predictions* both in bias and variance (measured by the MSE), so we unequivocally conclude that the new predictions are worse than the initial predictions. This conclusion is consistent with the goal of increasing the profit since the *new predictions* would reduce profits from \$200 (Period 1) to $138 (Period 3). 
+
+This consistency between improving profit and reducing machine-learning model errors also holds for the example where the model didn't 'overcorrect'. While the bias is the same in both cases (at 0%), the model's variance (i.e., MSE) is reduced.
+
+$$MSE_{period\ 1,\ initial\ predictions} =\frac{\left(100*3 - 100*2\right)^2 + \left(100*1 - 100*2\right)^2}{2} = 10000$$
+
+$$MSE_{period\ 1,\ better\ predictions} = \frac{(\left(100*2.5 - 100*2\right)^2 + \left(100*1.5 - 100*2\right)^2}{2} = 2500$$
+$$Bias_{period\ 1,\ initial\ predictions} =\frac{100*3 + 100*1}{100*2 + 100*2} - 1 = 0\%$$
+
+$$Bias_{period\ 1,\ better\ predictions} =\frac{100*2.5 + 100*1.5}{100*2 + 100*2} - 1 = 0\% $$
+
+Thus we would still conclude that the *better predictions* are indeed better.
+
+So by using this approach of **keeping the use-base proportion constant**, we correct the metrics used to evalue machine-learning models to be coherent with the goal of increasing profits through marketing campaigns.
+
 
 ### 2.3- Conclusion
 
